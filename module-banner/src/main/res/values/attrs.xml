@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="BannerView">
+    <attr format="enum" name="orientation">
+      <enum name="horizontal" value="0"/>
+      <enum name="vertical" value="1"/>
+    </attr>
+    <attr format="integer" name="durationTime"/>
+  </declare-styleable>
+</resources>

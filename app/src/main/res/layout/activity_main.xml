@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="横向"
+      />
+  <com.linecy.banner.BannerView
+      android:id="@+id/bannerView"
+      android:layout_width="match_parent"
+      android:layout_height="240dp"
+      android:clipChildren="false"
+      />
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:layout_marginBottom="16dp"
+      android:layout_marginTop="16dp"
+      android:background="#ff0000"
+      />
+
+  <TextView
+      android:id="@+id/text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      />
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="纵向"
+      />
+  <com.linecy.banner.BannerView
+      android:id="@+id/bannerView2"
+      android:layout_width="match_parent"
+      android:layout_height="240dp"
+      android:clipChildren="false"
+      app:orientation="vertical"
+      />
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:layout_marginBottom="16dp"
+      android:layout_marginTop="16dp"
+      android:background="#ff0000"
+      />
+  <TextView
+      android:id="@+id/text2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      />
+</LinearLayout>
