@@ -8,10 +8,10 @@ import com.linecy.banner.BannerCreator;
  * @author by linecy.
  */
 
-class NormalCreator implements BannerCreator<Integer> {
+class ScaleCreator implements BannerCreator<Integer> {
 
   @Override public int getLayoutResId() {
-    return R.layout.item_normal;
+    return R.layout.item_scale;
   }
 
   @Override public void onBindData(View view, Integer data, int position) {

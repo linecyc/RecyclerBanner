@@ -6,5 +6,12 @@
       <enum name="vertical" value="1"/>
     </attr>
     <attr format="integer" name="durationTime"/>
+    <attr format="boolean" name="isShowIndicator"/>
+    <attr format="boolean" name="isAutoPlay"/>
+    <attr format="boolean" name="isScaleCover"/>
+    <attr format="float" name="scaleSize"/>
+    <attr format="boolean" name="isShowBothEnds"/>
+    <attr format="dimension" name="BothEndsSpace"/>
+
   </declare-styleable>
 </resources>

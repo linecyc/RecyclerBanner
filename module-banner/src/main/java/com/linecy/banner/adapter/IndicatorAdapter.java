@@ -15,6 +15,7 @@ public class IndicatorAdapter extends RecyclerView.Adapter<IndicatorViewHolder> 
 
   @Override public IndicatorViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     ImageView imageView = new ImageView(parent.getContext());
+    imageView.setPadding(5, 5, 5, 5);
     imageView.setImageResource(R.drawable.selector_oval_indicator);
     return new IndicatorViewHolder(imageView);
   }
@@ -34,7 +35,10 @@ public class IndicatorAdapter extends RecyclerView.Adapter<IndicatorViewHolder> 
   }
 
   public void setCurrentPosition(int position) {
-    this.currentPosition = position;
-    notifyDataSetChanged();
+    if (this.currentPosition != position) {
+      notifyItemChanged(this.currentPosition);
+      notifyItemChanged(position);
+      this.currentPosition = position;
+    }
   }
 }
