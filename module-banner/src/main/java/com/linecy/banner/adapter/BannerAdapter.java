@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 轮播图适配器
+ *
  * @author by linecy.
  */
 
@@ -19,12 +21,15 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
   private OnBannerClickListener onBannerClickListener;
   private int space;
   private boolean isHorizontal;
-  private int viewSize;
+  private int viewSize;//itemView的宽或高
+  private int listSize;//数据集合的大小
+  private boolean isLoop;//是否循环播放
 
   public BannerAdapter(BannerCreator<T> creator) {
     this.bannerList = new ArrayList<>();
     this.bannerCreator = creator;
     this.isHorizontal = true;
+    this.listSize = 0;
   }
 
   @Override public BannerViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -32,14 +37,15 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
         .inflate(bannerCreator.getLayoutResId(), parent, false);
     RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
     if (isHorizontal) {
-      viewSize = lp.width = parent.getWidth() - lp.leftMargin - lp.rightMargin - space;
+      lp.width = parent.getWidth() - lp.leftMargin - lp.rightMargin - space;
+      viewSize = parent.getWidth() - space;
     } else {
-      viewSize = lp.height = parent.getHeight() - lp.topMargin - lp.bottomMargin - space;
+      lp.height = parent.getHeight() - lp.topMargin - lp.bottomMargin - space;
+      viewSize = parent.getHeight() - space;
     }
     view.setLayoutParams(lp);
     BannerViewHolder<T> viewHolder = new BannerViewHolder<>(view, bannerCreator);
     viewHolder.setOnBannerClickListener(onBannerClickListener);
-
     return viewHolder;
   }
 
@@ -49,19 +55,19 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
   }
 
   @Override public int getItemCount() {
-    if (bannerList.size() > 0) {
-      if (bannerList.size() > 1) {
+    if (this.listSize > 1) {
+      if (isLoop) {
         return Integer.MAX_VALUE;
       } else {
-        return 1;
+        return this.listSize;
       }
     } else {
-      return 0;
+      return this.listSize;
     }
   }
 
   public int getRealPosition(int position) {
-    return position % bannerList.size();
+    return this.listSize == 0 ? 0 : position % bannerList.size();
   }
 
   public void refreshData(List<T> list, boolean isHorizontal, int space) {
@@ -71,9 +77,19 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
     if (list != null && list.size() > 0) {
       this.bannerList.addAll(list);
     }
+    this.listSize = this.bannerList.size();
     notifyDataSetChanged();
   }
 
+  public void setLoop(boolean isLoop) {
+    this.isLoop = isLoop;
+  }
+
+  /**
+   * 拿到子view的宽或高，如果横向就是宽度，反之就是高度
+   *
+   * @return 宽或高
+   */
   public int getViewSize() {
     return viewSize;
   }

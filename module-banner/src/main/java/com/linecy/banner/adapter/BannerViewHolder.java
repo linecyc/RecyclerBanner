@@ -11,8 +11,8 @@ import com.linecy.banner.listener.OnBannerClickListener;
 
 public class BannerViewHolder<T> extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-  private OnBannerClickListener onBannerClickListener;
-  private Object data;
+  private OnBannerClickListener<T> onBannerClickListener;
+  private T data;
   private int position;
   private BannerCreator<T> bannerCreator;
   private View view;
@@ -38,7 +38,7 @@ public class BannerViewHolder<T> extends RecyclerView.ViewHolder implements View
     }
   }
 
-  public void setOnBannerClickListener(OnBannerClickListener l) {
+  public void setOnBannerClickListener(OnBannerClickListener<T> l) {
     this.onBannerClickListener = l;
   }
 }

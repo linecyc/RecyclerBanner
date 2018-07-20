@@ -28,11 +28,11 @@ public class ScaleActivity extends AppCompatActivity {
     bannerView.setupWithBannerCreator(new ScaleCreator());
     bannerView.setOrientation(BannerView.HORIZONTAL);
     bannerView.setScaleSize(0.75f);
-    bannerView.setSpaceBetween(200);
     if (getIntent().getBooleanExtra(EXTRA_DATA, true)) {
       bannerView.setScaleCover(true);
       name.setText("展示上一个和下一个");
     } else {
+      bannerView.setScaleCover(true).setSpaceBetween(200).setShowIndicator(false);
       name.setText("展示中间的个有放大效果");
     }
     initBannerView();
@@ -40,8 +40,8 @@ public class ScaleActivity extends AppCompatActivity {
 
   void initBannerView() {
     textView.setText("第 1 个");
-    bannerView.setOnBannerClickListener(new OnBannerClickListener() {
-      @Override public void onBannerClick(Object data, int position) {
+    bannerView.setOnBannerClickListener(new OnBannerClickListener<Integer>() {
+      @Override public void onBannerClick(Integer data, int position) {
         Toast.makeText(ScaleActivity.this, "第 " + ((position + 1)) + " 个", Toast.LENGTH_SHORT)
             .show();
       }
@@ -49,7 +49,8 @@ public class ScaleActivity extends AppCompatActivity {
     bannerView.setOnBannerScrollChangeListener(new OnBannerScrollChangeListener() {
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState, int position) {
-        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+        //如果根据newState判断的话，连续滑动时不会触发
+        if (position != -1) {
           textView.setText(String.valueOf("第 " + (position + 1) + " 个"));
         }
       }

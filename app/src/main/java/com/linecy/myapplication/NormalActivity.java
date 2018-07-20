@@ -47,7 +47,7 @@ public class NormalActivity extends AppCompatActivity {
     bannerView.setOnBannerScrollChangeListener(new OnBannerScrollChangeListener() {
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState, int position) {
-        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+        if (position != -1) {
           textView.setText(String.valueOf("第 " + (position + 1) + " 个"));
         }
       }

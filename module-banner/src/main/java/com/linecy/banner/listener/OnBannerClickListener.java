@@ -4,7 +4,7 @@ package com.linecy.banner.listener;
  * @author by linecy.
  */
 
-public interface OnBannerClickListener {
+public interface OnBannerClickListener<T> {
 
-  void onBannerClick(Object data, int position);
+  void onBannerClick(T data, int position);
 }

@@ -8,10 +8,12 @@
     <attr format="integer" name="durationTime"/>
     <attr format="boolean" name="isShowIndicator"/>
     <attr format="boolean" name="isAutoPlay"/>
+    <attr format="boolean" name="isLoop"/>
     <attr format="boolean" name="isScaleCover"/>
     <attr format="float" name="scaleSize"/>
     <attr format="boolean" name="isShowBothEnds"/>
     <attr format="dimension" name="BothEndsSpace"/>
+    <attr format="boolean" name="isInitOffsetCenter"/>
 
   </declare-styleable>
 </resources>
