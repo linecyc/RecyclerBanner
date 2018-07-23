@@ -18,10 +18,9 @@ import java.util.List;
 public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> {
   private List<T> bannerList;
   private BannerCreator<T> bannerCreator;
-  private OnBannerClickListener onBannerClickListener;
+  private OnBannerClickListener<T> onBannerClickListener;
   private int space;
   private boolean isHorizontal;
-  private int viewSize;//itemView的宽或高
   private int listSize;//数据集合的大小
   private boolean isLoop;//是否循环播放
 
@@ -34,14 +33,12 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
 
   @Override public BannerViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext())
-        .inflate(bannerCreator.getLayoutResId(), parent, false);
+        .inflate(bannerCreator.layoutResId(), parent, false);
     RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
     if (isHorizontal) {
       lp.width = parent.getWidth() - lp.leftMargin - lp.rightMargin - space;
-      viewSize = parent.getWidth() - space;
     } else {
       lp.height = parent.getHeight() - lp.topMargin - lp.bottomMargin - space;
-      viewSize = parent.getHeight() - space;
     }
     view.setLayoutParams(lp);
     BannerViewHolder<T> viewHolder = new BannerViewHolder<>(view, bannerCreator);
@@ -85,16 +82,7 @@ public class BannerAdapter<T> extends RecyclerView.Adapter<BannerViewHolder<T>> 
     this.isLoop = isLoop;
   }
 
-  /**
-   * 拿到子view的宽或高，如果横向就是宽度，反之就是高度
-   *
-   * @return 宽或高
-   */
-  public int getViewSize() {
-    return viewSize;
-  }
-
-  public void setOnBannerClickListener(OnBannerClickListener l) {
+  public void setOnBannerClickListener(OnBannerClickListener<T> l) {
     this.onBannerClickListener = l;
   }
 }

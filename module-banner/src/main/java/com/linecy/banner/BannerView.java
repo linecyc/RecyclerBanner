@@ -69,8 +69,6 @@ import java.util.List;
   private boolean isShowBothEnds;
   //两端预留空间
   private int space;
-  //初始状态时，是否偏移,保证scaleCover下居中展示
-  private boolean isInitOffset;
   //是否刷新数据
   private boolean isRefresh = false;
   //当前偏移量
@@ -81,6 +79,8 @@ import java.util.List;
   private int parentSize = 0;
   //是否启用轮播循环模式
   private boolean isLoop;
+  //初始中心位置
+  private int initCenter;
 
   private OnBannerScrollChangeListener onBannerScrollChangeListener;
   private RecyclerView recyclerIndicator;
@@ -130,7 +130,6 @@ import java.util.List;
     isShowBothEnds = isScaleCover || a.getBoolean(R.styleable.BannerView_isShowBothEnds, false);
     //左右两边*2
     space = (int) a.getDimension(R.styleable.BannerView_BothEndsSpace, dip2px(context, 24) * 2);
-    isInitOffset = a.getBoolean(R.styleable.BannerView_isInitOffsetCenter, true);
     a.recycle();
   }
 
@@ -175,8 +174,13 @@ import java.util.List;
       @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         //最多同时显示3个子view，只有最中间的一个是完成的
         //如果能够同时显示3个以上的话，改成findFirstVisibleItemPosition 和last吧
-        currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+        int pos = layoutManager.findLastCompletelyVisibleItemPosition();
+        if (-1 != pos) {
+          currentPosition = pos;
+        }
         int realPosition = bannerAdapter.getRealPosition(currentPosition);
+        //非无限模式下，解决最后一个不更新问题
+        indicatorAdapter.setCurrentPosition(realPosition);
         if (null != onBannerScrollChangeListener) {
           onBannerScrollChangeListener.onScrollStateChanged(recyclerView, newState, realPosition);
         }
@@ -192,7 +196,9 @@ import java.util.List;
         //如果判断此时是否选中和indicatorAdapter已经选中是否是同一个的话，局部更新感觉会抖动
         //放到onScrollStateChanged里，连续滑动不会更新
         if (isShowIndicator) {
-          currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+          int start = layoutManager.findFirstVisibleItemPosition();
+          int end = layoutManager.findLastVisibleItemPosition();
+          currentPosition = (start + end) / 2;
           int realPosition = bannerAdapter.getRealPosition(currentPosition);
           indicatorAdapter.setCurrentPosition(realPosition);
         }
@@ -212,6 +218,11 @@ import java.util.List;
     } else {
       parentSize = h;
     }
+    //子view的宽或高，包含外边距
+    childSize = parentSize - space;
+    //bannerView的中心，横向即为x，纵向即为y
+    //如果初始时没有偏移量的话，初始中心为子view中心，否则为父view中心
+    initCenter = isLoop ? parentSize / 2 : childSize / 2;
   }
 
   @Override public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -248,11 +259,8 @@ import java.util.List;
    */
   @Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
-    if (isLoop && isRefresh && isInitOffset) {
-      //初始化时偏移居中
-      if (childSize == 0) {
-        childSize = bannerAdapter.getViewSize();
-      }
+    if (isLoop && isRefresh && isShowBothEnds) {
+      //需要刷新数据，无限循环，展示两端，才初始化时偏移居中
       if (childSize != 0) {
         if (orientation == HORIZONTAL) {
           int offset = getPaddingLeft();
@@ -313,9 +321,6 @@ import java.util.List;
     } else if (layoutManager.canScrollVertically()) {
       currentOffset += dy;
     }
-    if (childSize == 0) {
-      childSize = bannerAdapter.getViewSize();
-    }
     //保存上一屏的偏移量，避免偏移重置后无法确定上一次的偏移量，所以在2倍后重置
     if (currentOffset > childSize * 2) {
       currentOffset -= childSize;
@@ -353,12 +358,10 @@ import java.util.List;
       boolean isPositive, float scale) {
     if (startView != null && centerView != null && endView != null) {
       //子view的中心，横向即为x，纵向即为y
-      int childCenter =
-          (orientation == HORIZONTAL ? centerView.getLeft() : centerView.getTop()) + childSize / 2;
-      //bannerView的中心，横向即为x，纵向即为y
-      int parentCenter = parentSize / 2;
+      int childCenter = orientation == HORIZONTAL ? centerView.getLeft() + centerView.getWidth() / 2
+          : centerView.getTop() + centerView.getHeight() / 2;
       if (start != center) {//不是最后就是开始状态
-        if (childCenter == parentCenter) {//中间
+        if (childCenter == initCenter) {//中间
           if (orientation == HORIZONTAL) {
             startView.setScaleY(scaleSize);
             centerView.setScaleY(1);
@@ -368,8 +371,8 @@ import java.util.List;
             centerView.setScaleX(1);
             endView.setScaleX(scaleSize);
           }
-        } else if ((isPositive && childCenter < parentCenter)
-            || !isPositive && childCenter > parentCenter) {//起始位置的左边
+        } else if ((isPositive && childCenter < initCenter)
+            || !isPositive && childCenter > initCenter) {//起始位置的左边
           if (orientation == HORIZONTAL) {
             startView.setScaleY(scale + scaleSize);
             centerView.setScaleY(1 - scale);
@@ -615,7 +618,7 @@ import java.util.List;
       }
       firstPosition = list.size() > 1 ? list.size() * 1000 : 0;
       currentPosition = firstPosition;
-      if (!isLoop || !isInitOffset) {
+      if (!isLoop || !isShowBothEnds) {
         recyclerBanner.scrollToPosition(currentPosition);
       }
       int realPosition = bannerAdapter.getRealPosition(currentPosition);

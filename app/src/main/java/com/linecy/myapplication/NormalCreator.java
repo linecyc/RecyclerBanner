@@ -10,7 +10,7 @@ import com.linecy.banner.BannerCreator;
 
 class NormalCreator implements BannerCreator<Integer> {
 
-  @Override public int getLayoutResId() {
+  @Override public int layoutResId() {
     return R.layout.item_normal;
   }
 

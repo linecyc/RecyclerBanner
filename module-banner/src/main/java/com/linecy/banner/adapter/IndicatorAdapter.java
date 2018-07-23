@@ -44,7 +44,7 @@ public class IndicatorAdapter extends RecyclerView.Adapter<IndicatorViewHolder> 
   }
 
   public void setCurrentPosition(int position) {
-    if (this.currentPosition != position) {
+    if (-1 != position && this.currentPosition != position) {
       notifyItemChanged(this.currentPosition);
       notifyItemChanged(position);
       this.currentPosition = position;

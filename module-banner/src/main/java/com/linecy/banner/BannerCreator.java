@@ -7,7 +7,7 @@ import android.view.View;
  */
 public interface BannerCreator<T> {
 
-  int getLayoutResId();
+  int layoutResId();
 
   void onBindData(View view, T data, int position);
 }

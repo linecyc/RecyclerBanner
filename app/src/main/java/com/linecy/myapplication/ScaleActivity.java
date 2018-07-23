@@ -29,7 +29,7 @@ public class ScaleActivity extends AppCompatActivity {
     bannerView.setOrientation(BannerView.HORIZONTAL);
     bannerView.setScaleSize(0.75f);
     if (getIntent().getBooleanExtra(EXTRA_DATA, true)) {
-      bannerView.setScaleCover(true);
+      bannerView.setScaleCover(false);
       name.setText("展示上一个和下一个");
     } else {
       bannerView.setScaleCover(true).setSpaceBetween(200).setShowIndicator(false);

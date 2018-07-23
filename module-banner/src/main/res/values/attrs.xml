@@ -13,7 +13,6 @@
     <attr format="float" name="scaleSize"/>
     <attr format="boolean" name="isShowBothEnds"/>
     <attr format="dimension" name="BothEndsSpace"/>
-    <attr format="boolean" name="isInitOffsetCenter"/>
 
   </declare-styleable>
 </resources>
