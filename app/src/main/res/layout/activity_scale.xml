@@ -18,10 +18,10 @@
       tools:text="横向"
       />
   <com.linecy.banner.BannerView
-      app:isShowBothEnds="true"
       android:id="@+id/bannerView"
       android:layout_width="0dp"
       android:layout_height="0dp"
+      app:isShowBothEnds="true"
       app:layout_constraintDimensionRatio="H,16:9"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -35,5 +35,15 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/bannerView"
+      />
+    <com.linecy.banner.BannerView
+      android:id="@+id/bannerView2"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:isShowBothEnds="true"
+      app:layout_constraintDimensionRatio="H,16:9"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/textView2"
       />
 </android.support.constraint.ConstraintLayout>

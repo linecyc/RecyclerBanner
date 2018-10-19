@@ -1,8 +1,6 @@
 ### 截图
 
-<img width="300" height="500" src="https://github.com/linecyc/RecyclerBanner/blob/master/screenshots/p4.png"/> <img width="300" height="500" src="https://github.com/linecyc/RecyclerBanner/blob/master/screenshots/p1.png"/><br />
-<img width="300" height="500" src="https://github.com/linecyc/RecyclerBanner/blob/master/screenshots/p2.png"/> <img width="300" height="500" src="https://github.com/linecyc/RecyclerBanner/blob/master/screenshots/p3.png"/>
-
+<img width="300" height="500" src="https://github.com/linecyc/RecyclerBanner/blob/master/screenshots/p0.gif"/>
 
 ### 使用
 
@@ -19,7 +17,7 @@
       		@Override public void onBindData(View view, T data, int position) {
 				//绑定数据
     			ImageView imageView = view.findViewById(R.id.iv);
-    		imageView.setBackgroundColor(data);
+    		  imageView.setBackgroundColor(data);
       		}
     	}
 

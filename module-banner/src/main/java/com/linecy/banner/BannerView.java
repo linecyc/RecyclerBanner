@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.linecy.banner.adapter.BannerAdapter;
 import com.linecy.banner.adapter.IndicatorAdapter;
+import com.linecy.banner.layoutmanager.BannerLayoutManager;
 import com.linecy.banner.listener.OnBannerClickListener;
 import com.linecy.banner.listener.OnBannerScrollChangeListener;
 import java.lang.ref.WeakReference;
@@ -42,7 +42,7 @@ import java.util.List;
   private static final int DEFAULT_DURATION = 3000;
   private static final int MSG_AUTO_PLAY = 10;
 
-  private LinearLayoutManager layoutManager;
+  private BannerLayoutManager layoutManager;
   private RecyclerView recyclerBanner;
   private BannerAdapter bannerAdapter;
   private IndicatorAdapter indicatorAdapter;
@@ -139,7 +139,7 @@ import java.util.List;
     recyclerBanner = new RecyclerView(context);
     LayoutParams lp =
         new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-    layoutManager = new LinearLayoutManager(context, orientation, false);
+    layoutManager = new BannerLayoutManager(context, orientation, false);
     recyclerBanner.setLayoutManager(layoutManager);
     addView(recyclerBanner, lp);
 
@@ -149,21 +149,6 @@ import java.util.List;
       setIndicatorDrawableRes(R.drawable.selector_oval_indicator);
     }
     addListenerForRecycler();
-  }
-
-  /**
-   * 初始化指示器
-   */
-  private void initIndicatorController() {
-    recyclerIndicator = new RecyclerView(context);
-    recyclerIndicator.setLayoutManager(new LinearLayoutManager(context, HORIZONTAL, false));
-    LayoutParams lp =
-        new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    lp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-    lp.bottomMargin = 20;
-    addView(recyclerIndicator, lp);
-    indicatorAdapter = new IndicatorAdapter();
-    recyclerIndicator.setAdapter(indicatorAdapter);
   }
 
   /**
@@ -259,8 +244,10 @@ import java.util.List;
    */
   @Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
-    if (isLoop && isRefresh && isShowBothEnds) {
-      //需要刷新数据，无限循环，展示两端，才初始化时偏移居中
+    if (isRefresh && isShowBothEnds && (isLoop || firstPosition == 0)) {
+      //需要刷新数据，展示两端，无限循环或者只有一个item的时候才初始化时偏移居中
+      //因为firstPosition==0，只有刷新数据时，list集合只有1个数据时才成立，所以用此条件代替只有一个数据的情况
+      //fix 只有一个数据且展示两端时没有偏移的问题
       if (childSize != 0) {
         if (orientation == HORIZONTAL) {
           int offset = getPaddingLeft();
@@ -420,10 +407,9 @@ import java.util.List;
    *
    * @param creator BannerCreator
    */
-  public BannerView setupWithBannerCreator(BannerCreator creator) {
+  public void setupWithBannerCreator(BannerCreator creator) {
     bannerAdapter = new BannerAdapter(creator);
     recyclerBanner.setAdapter(bannerAdapter);
-    return this;
   }
 
   /**
@@ -431,12 +417,11 @@ import java.util.List;
    *
    * @param isScaleCover 是否
    */
-  public BannerView setScaleCover(boolean isScaleCover) {
+  public void setScaleCover(boolean isScaleCover) {
     this.isScaleCover = isScaleCover;
     if (isScaleCover) {
       this.isShowBothEnds = true;
     }
-    return this;
   }
 
   /**
@@ -444,12 +429,11 @@ import java.util.List;
    *
    * @param scaleSize 比例
    */
-  public BannerView setScaleSize(float scaleSize) {
+  public void setScaleSize(float scaleSize) {
     if (scaleSize > 1) {
       throw new IllegalArgumentException("The scale size must be less than 1.");
     }
     this.scaleSize = scaleSize;
-    return this;
   }
 
   /**
@@ -458,9 +442,8 @@ import java.util.List;
    * @param space 预留空间
    * @link isShowBothEnds == true才有效
    */
-  public BannerView setSpaceBetween(int space) {
+  public void setSpaceBetween(int space) {
     this.space = space * 2;
-    return this;
   }
 
   /**
@@ -468,9 +451,8 @@ import java.util.List;
    *
    * @param isShowBothEnds 是否
    */
-  public BannerView setShowBothEnds(boolean isShowBothEnds) {
+  public void setShowBothEnds(boolean isShowBothEnds) {
     this.isShowBothEnds = isShowBothEnds;
-    return this;
   }
 
   /**
@@ -478,34 +460,26 @@ import java.util.List;
    *
    * @param isShowIndicator 是否
    */
-  public BannerView setShowIndicator(boolean isShowIndicator) {
+  public void setShowIndicator(boolean isShowIndicator) {
     this.isShowIndicator = isShowIndicator;
     if (this.isShowIndicator && recyclerIndicator == null) {
-      initIndicatorController();
+      setIndicatorStyle(HORIZONTAL, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 20);
     } else if (!this.isShowIndicator) {
       removeView(recyclerIndicator);
     }
-    return this;
   }
 
   /**
    * 设置指示器样式
    */
 
-  public BannerView setIndicatorDrawableRes(@DrawableRes int indicatorRes) {
-    if (indicatorAdapter == null) {
-      initIndicatorController();
+  public void setIndicatorDrawableRes(@DrawableRes int indicatorRes) {
+    if (isShowIndicator) {
+      if (indicatorAdapter == null) {
+        setIndicatorStyle(HORIZONTAL, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 20);
+      }
+      indicatorAdapter.setIndicatorDrawableRes(indicatorRes);
     }
-    indicatorAdapter.setIndicatorDrawableRes(indicatorRes);
-    return this;
-  }
-
-  public BannerView setIndicatorColorRes(@ColorInt int indicatorRes) {
-    if (indicatorAdapter == null) {
-      initIndicatorController();
-    }
-    indicatorAdapter.setIndicatorColorRes(indicatorRes);
-    return this;
   }
 
   /**
@@ -518,7 +492,7 @@ import java.util.List;
    * @param rightMargin 有边距
    * @param bottomMargin 底部边距
    */
-  public BannerView setIndicatorStyle(int orientation, int gravity, int leftMargin, int topMargin,
+  public void setIndicatorStyle(int orientation, int gravity, int leftMargin, int topMargin,
       int rightMargin, int bottomMargin) {
     if (recyclerIndicator != null) {
       removeView(recyclerIndicator);
@@ -537,7 +511,6 @@ import java.util.List;
       indicatorAdapter = new IndicatorAdapter();
     }
     recyclerIndicator.setAdapter(indicatorAdapter);
-    return this;
   }
 
   /**
@@ -545,14 +518,13 @@ import java.util.List;
    *
    * @param orientation 方向
    */
-  public BannerView setOrientation(int orientation) {
+  public void setOrientation(int orientation) {
     if (orientation != HORIZONTAL && orientation != VERTICAL) {
       throw new IllegalArgumentException("The orientation must be equals HORIZONTAL or VERTICAL.");
     }
     this.orientation = orientation;
-    layoutManager = new LinearLayoutManager(context, orientation, false);
+    layoutManager = new BannerLayoutManager(context, orientation, false);
     recyclerBanner.setLayoutManager(layoutManager);
-    return this;
   }
 
   /**
@@ -562,9 +534,8 @@ import java.util.List;
    *
    * @param isAutoPlay flag
    */
-  public BannerView setAutoPlay(boolean isAutoPlay) {
+  public void setAutoPlay(boolean isAutoPlay) {
     this.isAutoPlay = isAutoPlay;
-    return this;
   }
 
   /**
@@ -574,9 +545,8 @@ import java.util.List;
    *
    * @param isLoop 是否
    */
-  public BannerView setLoop(boolean isLoop) {
+  public void setLoop(boolean isLoop) {
     this.isLoop = isLoop;
-    return this;
   }
 
   /**
@@ -584,9 +554,8 @@ import java.util.List;
    *
    * @param itemAnimator 动画
    */
-  public BannerView setItemAnimator(RecyclerView.ItemAnimator itemAnimator) {
+  public void setItemAnimator(RecyclerView.ItemAnimator itemAnimator) {
     recyclerBanner.setItemAnimator(itemAnimator);
-    return this;
   }
 
   /**
@@ -594,9 +563,8 @@ import java.util.List;
    *
    * @param duration duration time
    */
-  public BannerView setDurationTime(long duration) {
+  public void setDurationTime(long duration) {
     this.durationTime = duration;
-    return this;
   }
 
   /**
@@ -613,16 +581,12 @@ import java.util.List;
         this.isShowBothEnds ? this.space : 0);
     if (list != null && list.size() > 0) {
       indicatorAdapter.setSize(list.size());
-      if (list.size() < 1) {
-        isAutoPlay = false;
-      }
       firstPosition = list.size() > 1 ? list.size() * 1000 : 0;
       currentPosition = firstPosition;
       if (!isLoop || !isShowBothEnds) {
         recyclerBanner.scrollToPosition(currentPosition);
       }
-      int realPosition = bannerAdapter.getRealPosition(currentPosition);
-      indicatorAdapter.setCurrentPosition(realPosition);
+      indicatorAdapter.setCurrentPosition(0);
     } else {
       firstPosition = -1;
       currentPosition = -1;
@@ -654,16 +618,14 @@ import java.util.List;
    *
    * @param l OnBannerClickListener
    */
-  public BannerView setOnBannerClickListener(OnBannerClickListener l) {
+  public void setOnBannerClickListener(OnBannerClickListener l) {
     if (bannerAdapter != null) {
       bannerAdapter.setOnBannerClickListener(l);
     }
-    return this;
   }
 
-  public BannerView setOnBannerScrollChangeListener(OnBannerScrollChangeListener l) {
+  public void setOnBannerScrollChangeListener(OnBannerScrollChangeListener l) {
     this.onBannerScrollChangeListener = l;
-    return this;
   }
 
   public static int dip2px(Context context, float dpValue) {

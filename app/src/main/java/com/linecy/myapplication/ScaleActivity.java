@@ -28,14 +28,23 @@ public class ScaleActivity extends AppCompatActivity {
     bannerView.setupWithBannerCreator(new ScaleCreator());
     bannerView.setOrientation(BannerView.HORIZONTAL);
     bannerView.setScaleSize(0.75f);
+    BannerView bannerView2 = findViewById(R.id.bannerView2);
+    bannerView2.setupWithBannerCreator(new ScaleCreator());
+    bannerView2.setOrientation(BannerView.VERTICAL);
+    bannerView2.setScaleSize(0.75f);
     if (getIntent().getBooleanExtra(EXTRA_DATA, true)) {
       bannerView.setScaleCover(false);
+      bannerView2.setScaleCover(false);
       name.setText("展示上一个和下一个");
     } else {
-      bannerView.setScaleCover(true).setSpaceBetween(200).setShowIndicator(false);
+      bannerView.setScaleCover(true);
+      bannerView.setShowIndicator(false);
+      bannerView2.setScaleCover(true);
+      bannerView2.setShowIndicator(false);
       name.setText("展示中间的个有放大效果");
     }
     initBannerView();
+    bannerView2.onRefreshData(createData());
   }
 
   void initBannerView() {

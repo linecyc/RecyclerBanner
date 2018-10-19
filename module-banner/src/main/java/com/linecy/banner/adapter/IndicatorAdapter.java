@@ -1,6 +1,5 @@
 package com.linecy.banner.adapter;
 
-import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
@@ -16,21 +15,16 @@ public class IndicatorAdapter extends RecyclerView.Adapter<IndicatorViewHolder> 
   private int size = 0;
   private int currentPosition = 0;
   private int drawableRes;
-  private int colorRes;
 
   @Override public IndicatorViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     ImageView imageView = new ImageView(parent.getContext());
     imageView.setPadding(5, 5, 5, 5);
-    if (colorRes == -1) {
-      imageView.setImageResource(drawableRes);
-    } else {
-      imageView.setBackgroundColor(colorRes);
-    }
     return new IndicatorViewHolder(imageView);
   }
 
   @Override public void onBindViewHolder(IndicatorViewHolder holder, int position) {
     ImageView imageView = (ImageView) holder.itemView;
+    imageView.setImageResource(drawableRes);
     imageView.setSelected(position == currentPosition);
   }
 
@@ -53,11 +47,6 @@ public class IndicatorAdapter extends RecyclerView.Adapter<IndicatorViewHolder> 
 
   public void setIndicatorDrawableRes(@DrawableRes int indicatorRes) {
     this.drawableRes = indicatorRes;
-    this.colorRes = -1;
-  }
-
-  public void setIndicatorColorRes(@ColorInt int indicatorRes) {
-    this.drawableRes = -1;
-    this.colorRes = indicatorRes;
+    notifyDataSetChanged();
   }
 }
